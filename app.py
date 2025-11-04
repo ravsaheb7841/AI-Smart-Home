@@ -44,10 +44,11 @@ def validate_user(username: str, password: str) -> bool:
 def init_session():
     defaults = {
         "logged_in": False,
-        "username": None,
+        "username": "",
         "devices": {"Light": False, "Fan": False, "AC": False, "TV": False},
         "automation": {"room_auto": True, "temp_threshold_ac": 30},
-        "last_log_update": datetime.now() - timedelta(hours=1)
+        "last_log_update": datetime.now() - timedelta(hours=1),
+        "room_temp": random.uniform(20, 35)
     }
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
@@ -79,15 +80,13 @@ def save_log(username: str, total_power: float):
         df.to_csv(log_file, index=False)
         st.session_state["last_log_update"] = now
         read_logs_cached.clear()
-        st.toast("Hourly log saved!")
+        st.success("Hourly log saved!")
 
 # SIMULATION
 def simulate_power_usage(devices):
     return {d: random.randint(50, 300) if s else 0 for d, s in devices.items()}
 
-def simulate_room_temperature():
-    return random.uniform(18, 40)
-
+# AUTOMATION FUNCTION
 def apply_room_automation(temp: float):
     auto = st.session_state.automation
     devices = st.session_state.devices
@@ -96,8 +95,10 @@ def apply_room_automation(temp: float):
         return
     if temp >= threshold and not devices["AC"]:
         devices["AC"] = True
+        st.success(f"Automation: AC turned ON (Temp: {temp:.1f}°C)")
     elif temp < threshold and devices["AC"]:
         devices["AC"] = False
+        st.success(f"Automation: AC turned OFF (Temp: {temp:.1f}°C)")
 
 # COMMAND PARSER
 def parse_command(cmd: str):
@@ -158,9 +159,9 @@ if not st.session_state.logged_in:
     st.stop()
 
 # DASHBOARD
-username = st.session_state.username
+username = st.session_state.get("username", "") or ""
 st.markdown(f"<h1 style='text-align:center'>Smart Home Dashboard</h1>", unsafe_allow_html=True)
-st.sidebar.title(f"Hi, {username.capitalize()}")
+st.sidebar.title(f"Hi, {username.capitalize() or 'User'}")
 
 # AUTO REFRESH
 st_autorefresh(interval=5000, key="refresh_data")
@@ -187,16 +188,33 @@ if st.sidebar.button("Logout"):
         del st.session_state[key]
     st.rerun()
 
-# TEMPERATURE & AUTOMATION
-temp = simulate_room_temperature()
-st.metric("Room Temp", f"{temp:.1f}°C", delta=f"{temp - 25:+.1f}°C")
+# TEMPERATURE SIMULATION (REALISTIC)
+change = random.uniform(-0.5, 0.5)
+st.session_state.room_temp = max(16, min(40, st.session_state.room_temp + change))
+temp = st.session_state.room_temp
+
+# show delta relative to AC threshold (plus if temp > threshold, minus if temp < threshold)
+threshold = int(st.session_state.automation.get("temp_threshold_ac", 30))
+delta = temp - threshold
+st.metric("Room Temp", f"{temp:.1f}°C", delta=f"{delta:+.1f}°C")
+st.caption(f"Delta relative to AC Threshold ({threshold}°C)")
+
+# APPLY AUTOMATION
 apply_room_automation(temp)
+
+# AUTOMATION STATUS INDICATOR
+if st.session_state.automation["room_auto"]:
+    st.success(f"Automation ON — AC auto-controls at {st.session_state.automation['temp_threshold_ac']}°C")
+else:
+    st.warning("Automation OFF — Manual control only")
 
 # DEVICE CONTROLS
 st.subheader("Device Control")
 cols = st.columns(4)
 for i, (device, state) in enumerate(st.session_state.devices.items()):
-    with cols[i]:
+    # guard column index in case number of devices changes
+    col = cols[i % len(cols)]
+    with col:
         checked = st.checkbox(device, value=state, key=f"toggle_{device}")
         if checked != state:
             st.session_state.devices[device] = checked
@@ -246,3 +264,7 @@ if not logs.empty:
     st.caption(f"Next log: {next_time.strftime('%H:%M:%S')}")
 else:
     st.info("No logs yet. First log in about an hour.")
+
+# FOOTER
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center'>© 2025 Smart Home. All rights reserved.</p>", unsafe_allow_html=True)
