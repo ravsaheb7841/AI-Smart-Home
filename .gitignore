@@ -4,8 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Ignore Streamlit cache folder
-.streamlit/
+# Ignore everything inside .streamlit except config.toml
+.streamlit/*
+!.streamlit/config.toml
 
 # Ignore log and user data files
 logs/

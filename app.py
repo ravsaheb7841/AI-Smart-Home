@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import random
 import matplotlib.pyplot as plt
-import speech_recognition as sr
-import pyttsx3
 from datetime import datetime, timedelta
 from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
@@ -49,27 +47,10 @@ def init_session():
         "username": None,
         "devices": {"Light": False, "Fan": False, "AC": False, "TV": False},
         "automation": {"room_auto": True, "temp_threshold_ac": 30},
-        "last_log_update": datetime.now() - timedelta(hours=1),
-        "tts_engine": None
+        "last_log_update": datetime.now() - timedelta(hours=1)
     }
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
-    if st.session_state.tts_engine is None:
-        try:
-            engine = pyttsx3.init()
-            engine.setProperty('rate', 160)
-            st.session_state.tts_engine = engine
-        except:
-            st.session_state.tts_engine = None
-
-def tts_say(text: str):
-    engine = st.session_state.tts_engine
-    if engine and text:
-        try:
-            engine.say(text)
-            engine.runAndWait()
-        except:
-            pass
 
 # LOGGING
 def get_log_file(username: str) -> Path:
@@ -115,10 +96,8 @@ def apply_room_automation(temp: float):
         return
     if temp >= threshold and not devices["AC"]:
         devices["AC"] = True
-        tts_say("High temperature detected. AC turned on.")
     elif temp < threshold and devices["AC"]:
         devices["AC"] = False
-        tts_say("Temperature normal. AC turned off.")
 
 # COMMAND PARSER
 def parse_command(cmd: str):
@@ -136,7 +115,6 @@ def parse_command(cmd: str):
     if "status" in cmd:
         status = ", ".join(f"{k}: {'ON' if v else 'OFF'}" for k, v in devices.items())
         actions.append(f"Status: {status}")
-        tts_say("Showing device status.")
     return actions
 
 # MAIN APP
@@ -145,7 +123,7 @@ init_session()
 # LOGIN / SIGNUP
 if not st.session_state.logged_in:
     st.markdown("<h1 style='text-align:center'>AI Smart Home Simulation</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; color:gray'>Voice-controlled IoT dashboard with automation</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; color:gray'>IoT dashboard with automation</p>", unsafe_allow_html=True)
 
     tab1, tab2 = st.tabs(["Login", "Signup"])
 
@@ -157,7 +135,6 @@ if not st.session_state.logged_in:
                 if validate_user(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username.lower()
-                    tts_say(f"Welcome {username}")
                     st.success("Login successful!")
                     st.rerun()
                 else:
@@ -171,7 +148,6 @@ if not st.session_state.logged_in:
                 if new_user and new_pass:
                     if save_user(new_user, new_pass):
                         st.success("Account created! Logging in...")
-                        tts_say("Account created. Welcome!")
                         st.session_state.logged_in = True
                         st.session_state.username = new_user.lower()
                         st.rerun()
@@ -209,38 +185,25 @@ st.subheader("Device Control")
 cols = st.columns(4)
 for i, (device, state) in enumerate(st.session_state.devices.items()):
     with cols[i]:
-        new_state = st.toggle(device, value=state, key=f"toggle_{device}")
-        if new_state != state:
-            st.session_state.devices[device] = new_state
-            tts_say(f"{device} {'on' if new_state else 'off'}")
+        checked = st.checkbox(device, value=state, key=f"toggle_{device}")
+        if checked != state:
+            st.session_state.devices[device] = checked
 
-# VOICE / TEXT CONTROL
-st.subheader("Voice / Text Control")
+# TEXT CONTROL
+st.subheader("Text Control")
 cmd_col1, cmd_col2 = st.columns(2)
 
 with cmd_col1:
-    if st.button("Speak Command", type="primary"):
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.info("Listening... (5s)")
-            try:
-                audio = r.listen(source, timeout=5, phrase_time_limit=5)
-                cmd = r.recognize_google(audio).lower()
-                st.success(f"Heard: `{cmd}`")
-                for a in parse_command(cmd):
-                    if "Status" not in a:
-                        st.toast(a)
-                tts_say("Command executed.")
-            except sr.WaitTimeoutError:
-                st.warning("No speech detected.")
-            except Exception:
-                st.error("Voice command failed. Check your microphone.")
+    st.info("Use the text box to send commands, e.g., 'turn on light' or 'status'.")
 
 with cmd_col2:
     text_cmd = st.text_input("Type command", placeholder="e.g., turn on light", key="text_cmd")
     if text_cmd:
         for a in parse_command(text_cmd):
-            st.info(a) if "Status" in a else st.success(a)
+            if "Status" in a:
+                st.info(a)
+            else:
+                st.success(a)
         st.rerun()
 
 # ENERGY USAGE
