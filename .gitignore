@@ -1,0 +1,20 @@
+# Ignore Python cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Streamlit cache folder
+.streamlit/
+
+# Ignore log and user data files
+logs/
+users.csv
+
+# Ignore virtual environment folders
+venv/
+env/
+
+# Ignore system files
+.DS_Store
+Thumbs.db

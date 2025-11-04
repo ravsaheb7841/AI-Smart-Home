@@ -1,0 +1,7 @@
+streamlit
+pandas
+matplotlib
+SpeechRecognition
+pyttsx3
+streamlit-autorefresh
+pyaudio
