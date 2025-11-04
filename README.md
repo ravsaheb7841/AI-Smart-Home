@@ -96,7 +96,7 @@ Type commands in the input box:
 
 ## Developer
 
-Sahil Banso
+Ravsaheb Bansode
 - Email: bansoderav@gmail.com 
 - GitHub: [@ravsaheb7841](https://github.com/ravsaheb7841)
 
