@@ -1,99 +1,103 @@
----
+# AI Smart Home Simulation 🏠
 
-### 🏠 **AI Smart Home Simulation**
+A Streamlit-powered smart home simulation featuring voice control, device automation, and energy monitoring dashboard.
 
-An interactive Streamlit-based Smart Home Simulation that allows users to control lights, fans, doors, and other devices using both voice commands and buttons. It also tracks power consumption, displays usage charts, and stores user activity logs for analysis.
+## Overview
 
-⚙️ Note: This version currently simulates smart device control and does not include real IoT hardware integration yet. Future updates will focus on connecting the system with actual IoT sensors and devices for real-time automation.
+This project simulates a modern smart home interface with:
 
----
+- Voice and text-based device control
+- Temperature-based automation
+- Power usage monitoring
+- User authentication
+- Activity logging
 
-### ⚙️ **Features**
+> **Note:** This is a simulation - no actual IoT hardware integration yet.
 
-* 🎙️ Voice command control using `SpeechRecognition`
-* 💡 Control devices (Lights, Fans, Doors) with on/off buttons
-* 📊 Real-time dashboard for device status
-* 🔊 Voice feedback using `pyttsx3`
-* 📈 Power consumption visualization using `matplotlib`
-* 🧾 Logs user activity automatically
-* 👤 User authentication system
+## Features
 
----
+- 🎙️ Voice commands via `SpeechRecognition`
+- 💡 Interactive device controls (Lights, Fan, AC, TV)  
+- 🌡️ Temperature-based automation
+- 📊 Real-time power usage charts
+- 🔊 Voice feedback using `pyttsx3`
+- 📝 Hourly activity logging
+- 🔐 User accounts system
 
-### 🧰 **Tech Stack**
+## Tech Stack
 
-* **Frontend:** Streamlit
-* **Backend:** Python
-* **Libraries:** Pandas, Matplotlib, Pyttsx3, SpeechRecognition, Streamlit-Autorefresh
+- Frontend: Streamlit
+- Backend: Python 3.8+
+- Key Libraries:
+  - `streamlit`
+  - `pandas` 
+  - `matplotlib`
+  - `pyttsx3`
+  - `SpeechRecognition`
+  - `streamlit-autorefresh`
 
----
-
-### 🧩 **Project Structure**
+## Project Structure
 
 ```
-AI-Smart-Home/
-│
-├── app.py                   # Main Streamlit app
-├── requirements.txt         # Required dependencies
-├── .gitignore               # Ignore unnecessary files
-├── README.md                # Project description
-├── users.csv                # User data (auto-created)
-├── logs/                    # Activity logs (auto-created)
+smart-home/
+├── app.py              # Main application
+├── requirements.txt    # Dependencies
+├── users.csv          # User database
+├── logs/              # Activity logs
+│   └── device_log_*.csv
 └── .streamlit/
-    └── config.toml          # Streamlit theme and UI configuration
+    └── config.toml    # Streamlit config
 ```
 
----
+## Setup
 
-### 🚀 **Setup and Run**
-
-#### 1️⃣ Clone the repository
-
+1. Clone the repository:
 ```bash
-git clone https://github.com/<your-username>/AI-Smart-Home.git
-cd AI-Smart-Home
+git clone https://github.com/yourusername/smart-home.git
+cd smart-home
 ```
 
-#### 2️⃣ Install dependencies
-
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 3️⃣ Run the Streamlit app
-
+3. Run the app:
 ```bash
 streamlit run app.py
 ```
 
-#### 4️⃣ Open in browser
+4. Access at http://localhost:8501
 
-Your app will open automatically at:
-👉 [http://localhost:8501](http://localhost:8501)
+## Usage
 
----
+### Voice Commands
 
-### 🧾 **Sample Voice Commands**
+Examples:
+- "Turn on light"
+- "Turn off fan" 
+- "Show device status"
+- "What's the temperature?"
 
-* “Turn on the light”
-* “Turn off the fan”
-* “Open the door”
-* “Close the door”
+### Text Commands
 
----
+Type commands in the input box:
+- "light on"
+- "fan off"
+- "ac on"
+- "status"
 
-### 📊 **Future Enhancements**
+## Coming Soon
 
-* Add smart temperature control
-* Connect with IoT devices
-* Add mobile app integration
+- [ ] IoT device integration
+- [ ] Mobile app
+- [ ] Advanced automation rules
+- [ ] Remote access
 
----
+## Developer
 
-### 🧑‍💻 **Developer**
-
-**Sahil Banso**
-📧 Email: *[bansoderav@gmail.com]*
-🌐 GitHub: [https://github.com/ravsaheb7841](https://github.com/ravsaheb7841)
+Sahil Banso
+- Email: bansoderav@gmail.com 
+- GitHub: [@ravsaheb7841](https://github.com/ravsaheb7841)
 
 ---
