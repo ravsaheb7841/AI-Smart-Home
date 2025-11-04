@@ -167,8 +167,20 @@ st_autorefresh(interval=5000, key="refresh_data")
 
 # AUTOMATION SETTINGS
 with st.sidebar.expander("Automation", expanded=True):
-    st.session_state.automation["room_auto"] = st.checkbox("Temperature Automation", value=st.session_state.automation["room_auto"])
-    st.session_state.automation["temp_threshold_ac"] = st.number_input("AC Threshold (°C)", 16, 45, st.session_state.automation["temp_threshold_ac"])
+    st.session_state.automation["room_auto"] = st.checkbox(
+        "Temperature Automation",
+        value=st.session_state.automation["room_auto"]
+    )
+    temp_thresh = st.number_input(
+        "AC Threshold (°C)",
+        min_value=16,
+        max_value=45,
+        value=int(st.session_state.automation.get("temp_threshold_ac", 30)),
+        step=1,
+        format="%d",
+        help="Temperature (°C) at which the AC will toggle"
+    )
+    st.session_state.automation["temp_threshold_ac"] = int(temp_thresh)
 
 if st.sidebar.button("Logout"):
     for key in list(st.session_state.keys()):
